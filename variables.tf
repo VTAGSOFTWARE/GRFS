@@ -240,3 +240,43 @@ variable "integration_lambda_zip_path" {
 variable "use_custom_ami" {
   description = "Custom AMI"
 }
+
+variable "db_instance_class" {
+  type    = string
+  default = "db.t3.large"
+}
+
+variable "db_multi_az" {
+  type    = bool
+  default = true
+}
+
+variable "db_backup_retention" {
+  type    = number
+  default = 7
+}
+
+variable "db_backup_window" {
+  type    = string
+  default = "03:00-04:00"
+}
+
+variable "db_maintenance_window" {
+  type    = string
+  default = "sun:04:00-sun:05:00"
+}
+
+variable "root_volume_size" {
+  type    = number
+  default = 30
+}
+
+variable "root_volume_type" {
+  type    = string
+  default = "gp3"
+}
+
+variable "root_volume_encrypted" {
+  type    = bool
+  default = true
+}

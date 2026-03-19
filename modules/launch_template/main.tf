@@ -34,6 +34,25 @@ resource "aws_launch_template" "this" {
     var.compute_mode == "ecs" ? local.ecs_user_data : var.user_data_extra
   )
 
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      volume_size           = var.root_volume_size
+      volume_type           = var.root_volume_type
+      encrypted             = var.root_volume_encrypted
+      delete_on_termination = true
+    }
+  }
+
+  metadata_options {
+    http_tokens = "required"
+  }
+
+  monitoring {
+    enabled = true
+  }
+
   tag_specifications {
     resource_type = "instance"
     tags          = var.tags

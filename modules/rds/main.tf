@@ -66,7 +66,12 @@ resource "aws_db_instance" "this" {
   deletion_protection = true
 
   final_snapshot_identifier = "${local.name_prefix}-final-snapshot"
+  backup_retention_period   = var.backup_retention_period
+  backup_window             = var.backup_window
+  maintenance_window        = var.maintenance_window
 
+  enabled_cloudwatch_logs_exports = ["postgresql"]
+  auto_minor_version_upgrade      = true
   tags = merge(var.tags, {
     Name = "${local.name_prefix}-postgres"
   })

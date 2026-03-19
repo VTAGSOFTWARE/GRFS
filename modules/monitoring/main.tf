@@ -1,6 +1,6 @@
 # ALB 5XX Alarm
 resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
-  alarm_name          = "alb-5xx-errors"
+  alarm_name          = "${var.project_name}-${var.environment}-alb-5xx-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "HTTPCode_ELB_5XX_Count"
@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
 
 # RDS CPU Alarm
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
-  alarm_name          = "rds-high-cpu"
+  alarm_name          = "${var.project_name}-${var.environment}-rds-high-cpu"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "CPUUtilization"
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
 
 # Lambda Errors
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
-  alarm_name          = "lambda-errors"
+  alarm_name          = "${var.project_name}-${var.environment}-lambda-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "Errors"
@@ -51,7 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
 
 # SQS Depth Alarm
 resource "aws_cloudwatch_metric_alarm" "sqs_depth" {
-  alarm_name          = "sqs-depth-high"
+  alarm_name          = "${var.project_name}-${var.environment}-sqs-depth-high"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "ApproximateNumberOfMessagesVisible"

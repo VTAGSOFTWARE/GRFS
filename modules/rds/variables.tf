@@ -59,3 +59,18 @@ variable "storage_type" {
   default     = "gp3"
   description = "Type of storage"
 }
+
+variable "backup_retention_period" {
+  type    = number
+  default = 7
+}
+
+variable "backup_window" {
+  type    = string
+  default = "03:00-04:00"
+}
+
+variable "maintenance_window" {
+  type    = string
+  default = "sun:04:00-sun:05:00"
+}

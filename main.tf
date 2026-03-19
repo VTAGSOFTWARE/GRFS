@@ -60,6 +60,12 @@ module "rds" {
   security_group_id = module.security.rds_sg_id
   storage_type      = var.storage_type
 
+  instance_class          = var.db_instance_class
+  multi_az                = var.db_multi_az
+  backup_retention_period = var.db_backup_retention
+  backup_window           = var.db_backup_window
+  maintenance_window      = var.db_maintenance_window
+
   tags = {
     Project     = var.project_name
     Environment = var.environment
@@ -117,6 +123,10 @@ module "launch_template" {
   ecs_cluster_name = "${var.project_name}-${var.environment}-ecs"
 
   ami_id = var.use_custom_ami ? module.custom_ami.ami_id : var.ami_id
+
+  root_volume_size      = var.root_volume_size
+  root_volume_type      = var.root_volume_type
+  root_volume_encrypted = var.root_volume_encrypted
 
   user_data_extra = <<-EOF
 #!/bin/bash
@@ -331,9 +341,9 @@ module "kyc_sqs_trigger" {
   maximum_concurrency                = 5
 }
 
-resource "aws_guardduty_detector" "this" {
-  enable = true
-}
+###resource "aws_guardduty_detector" "this" {
+###  enable = true
+###}
 
 module "vpc_endpoints" {
   source = "./modules/vpc_endpoints"
@@ -356,31 +366,33 @@ module "monitoring" {
   lambda_name             = module.kyc_lambda.function_name
   sqs_queue_name          = module.campaign_queue.queue_name
   tags                    = local.common_tags
+  project_name            = var.project_name
+  environment             = var.environment
 }
 
-##New Code
-##module "amplify" {
-##  source = "./modules/amplify"
+####New Code
+####module "amplify" {
+####  source = "./modules/amplify"
+####
+####  app_name       = "${local.name_prefix}-frontend"
+####  repository_url = var.amplify_repository_url
+####  oauth_token    = var.amplify_oauth_token
+####  branch_name    = var.amplify_branch_name
+####
+####  enable_auto_build = true
+####
+####  environment_variables = {
+####    ENV = var.environment
+####  }
+####
+####  # Optional: if you want branch-specific ENV vars
+####  branch_environment_variables = {
+####    REACT_APP_ENV = var.environment
+####  }
+####
+####  tags = local.common_tags
+####}
 ##
-##  app_name       = "${local.name_prefix}-frontend"
-##  repository_url = var.amplify_repository_url
-##  oauth_token    = var.amplify_oauth_token
-##  branch_name    = var.amplify_branch_name
-##
-##  enable_auto_build = true
-##
-##  environment_variables = {
-##    ENV = var.environment
-##  }
-##
-##  # Optional: if you want branch-specific ENV vars
-##  branch_environment_variables = {
-##    REACT_APP_ENV = var.environment
-##  }
-##
-##  tags = local.common_tags
-##}
-
 module "waf_cloudfront" {
   source = "./modules/waf_cloudfront"
 
@@ -395,28 +407,28 @@ module "waf_cloudfront" {
   tags = local.common_tags
 }
 
-module "cloudfront" {
-  source = "./modules/cloudfront"
-
-  providers = { aws = aws.us_east_1 }
-
-  alb_dns_name        = module.alb.alb_dns_name
-  acm_certificate_arn = var.cloudfront_acm_certificate_arn
-  web_acl_arn         = module.waf_cloudfront.web_acl_arn
-
-  aliases = var.cloudfront_acm_certificate_arn == null ? [] : ["uat.goldenrichproperties.com"]
-
-  tags = local.common_tags
-}
-
-##module "route53" {
-##  source = "./modules/route53"
+###module "cloudfront" {
+###  source = "./modules/cloudfront"
+###
+###  providers = { aws = aws.us_east_1 }
+###
+###  alb_dns_name        = module.alb.alb_dns_name
+###  acm_certificate_arn = var.cloudfront_acm_certificate_arn
+###  web_acl_arn         = module.waf_cloudfront.web_acl_arn
+###
+###  aliases = var.cloudfront_acm_certificate_arn == null ? [] : ["uat.goldenrichproperties.com"]
+###
+###  tags = local.common_tags
+###}
 ##
-##  zone_id                   = var.route53_zone_id
-##  record_name               = var.app_domain
-##  cloudfront_domain_name    = module.cloudfront.domain_name
-##  cloudfront_hosted_zone_id = module.cloudfront.hosted_zone_id
-##}
+####module "route53" {
+####  source = "./modules/route53"
+####
+####  zone_id                   = var.route53_zone_id
+####  record_name               = var.app_domain
+####  cloudfront_domain_name    = module.cloudfront.domain_name
+####  cloudfront_hosted_zone_id = module.cloudfront.hosted_zone_id
+####}
 
 module "file_scanner_lambda_iam" {
   source            = "./modules/lambda_iam"
